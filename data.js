@@ -11,6 +11,7 @@ const STANSIYALAR = [
     { id: 5, nom: "Sariosiyo", lat: 38.367523, lon: 68.009133, yuk: 0 },
     { id: 6, nom: "Denov", lat: 38.271919, lon: 67.906294, yuk: 0 },
     { id: 7, nom: "Quduqli", lat: 38.4601, lon: 68.13805, yuk: 0 },
+    { id: 8, nom: "Termiz", lat: 37.251377, lon: 67.287246, yuk: 0 },
 ];
 
 // Avtomobil logistika markazi
@@ -65,6 +66,22 @@ const NOMZODLAR = [
         lat: 37.252996,
         lon: 67.389353,
         ty_masofa_km: 0.4,
+        maydon: 1,
+    },
+    {
+        id: "N4",
+        nom: "Termiz Cargo Center (avto LC)",
+        lat: 37.2541249,
+        lon: 67.4234009,
+        ty_masofa_km: 12.0,
+        maydon: 1,
+    },
+    {
+        id: "N5",
+        nom: "Termiz logistik markazi (TY LC)",
+        lat: 37.245481,
+        lon: 67.265025,
+        ty_masofa_km: 2.0,
         maydon: 1,
     },
 ];
