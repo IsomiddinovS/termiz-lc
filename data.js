@@ -14,13 +14,6 @@ const STANSIYALAR = [
     { id: 8, nom: "Termiz", lat: 37.251377, lon: 67.287246, yuk: 0 },
 ];
 
-// Avtomobil logistika markazi
-const TEMIZ_CARGO = {
-    nom: "Temiz CARGO",
-    lat: 37.2541249,
-    lon: 67.4234009,
-};
-
 // ============================================================
 // MEZON 2 — KELTIRILGAN XARAJATLAR (Zj) NORMATIVLARI
 // O'zbekiston respublika normativlari va bozor ko'rsatkichlari

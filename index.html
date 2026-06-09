@@ -29,13 +29,6 @@
                     <!-- JS tomonidan to'ldiriladi -->
                 </div>
 
-                <div class="cargo-row" style="margin-top:10px;">
-                    <div class="dot"></div>
-                    <div>
-                        <div style="font-size:12px;font-weight:700;">Temiz CARGO</div>
-                        <div style="font-size:11px;color:#78350f;">Avtomobil LC — xaritada ko'rsatiladi</div>
-                    </div>
-                </div>
             </div>
 
             <!-- MEZON 2: Normativlar -->
@@ -85,10 +78,7 @@
                     <div class="rang" style="background:#3b82f6;"></div>
                     <span>TY stansiyasi</span>
                 </div>
-                <div class="izoh-qator">
-                    <div class="rang" style="background:#f59e0b;"></div>
-                    <span>Temiz CARGO (avto LC)</span>
-                </div>
+
                 <div class="izoh-qator">
                     <div class="rang" style="background:#ef4444;"></div>
                     <span>COG markazi (Mezon 1)</span>
@@ -132,7 +122,6 @@
 
         // ---- MARKERLAR UCHUN O'ZGARUVCHILAR ----
         let stansiyaMarkerlar = [];
-        let cargoMarker = null;
         let cogMarker = null;
         let cogDoira = null;
         let nomzodMarkerlar = [];
@@ -181,29 +170,6 @@
                 stansiyaMarkerlar.push(marker);
             });
 
-            // Temiz CARGO
-            const cargoIcon = L.divIcon({
-                className: '',
-                html: `<div style="
-      width:14px;height:14px;
-      background:#f59e0b;
-      border:2px solid #fff;
-      border-radius:3px;
-      box-shadow:0 2px 4px rgba(0,0,0,0.3);
-    "></div>`,
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
-            });
-
-            cargoMarker = L.marker([TEMIZ_CARGO.lat, TEMIZ_CARGO.lon], {
-                icon: cargoIcon
-            }).addTo(xarita);
-
-            cargoMarker.bindPopup(`
-    <b>${TEMIZ_CARGO.nom}</b>
-    <span>Avtomobil LC<br>
-    Koordinata: ${TEMIZ_CARGO.lat.toFixed(4)}, ${TEMIZ_CARGO.lon.toFixed(4)}</span>
-  `);
         }
 
         // ---- HISOBLASH VA KO'RSATISH ----
