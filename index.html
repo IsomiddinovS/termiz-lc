@@ -88,8 +88,12 @@
                     <span>Optimal LC (Mezon 2)</span>
                 </div>
                 <div class="izoh-qator">
-                    <div class="rang" style="background:#6b7280;"></div>
-                    <span>Nomzod joylashuvlar</span>
+                    <div class="rang kvadrat" style="background:#f59e0b;"></div>
+                    <span>Avto LC (nomzod)</span>
+                </div>
+                <div class="izoh-qator">
+                    <div class="rang kvadrat" style="background:#7c3aed;"></div>
+                    <span>TY LC (nomzod)</span>
                 </div>
             </div>
         </div>
@@ -168,6 +172,21 @@
       Koordinata: ${s.lat.toFixed(4)}, ${s.lon.toFixed(4)}</span>
     `);
                 stansiyaMarkerlar.push(marker);
+            });
+
+            // Doimiy nomzod markerlar (LC joylari)
+            const LC_RANGLAR = { avto: '#f59e0b', ty: '#7c3aed' };
+            NOMZODLAR.forEach(n => {
+                const rang = n.nom.includes('avto') ? LC_RANGLAR.avto : LC_RANGLAR.ty;
+                const tur = n.nom.includes('avto') ? 'Avto LC' : 'TY LC';
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div style="width:13px;height:13px;background:${rang};border:2px solid #fff;border-radius:3px;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
+                    iconSize: [13, 13],
+                    iconAnchor: [6, 6]
+                });
+                const m = L.marker([n.lat, n.lon], { icon }).addTo(xarita);
+                m.bindPopup(`<b>${n.nom.split('(')[0].trim()}</b><span>${tur}<br>Koordinata: ${n.lat.toFixed(4)}, ${n.lon.toFixed(4)}</span>`);
             });
 
         }
