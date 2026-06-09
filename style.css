@@ -98,9 +98,8 @@ header span.badge {
 .stansiya-row label {
     font-size: 13px;
     color: #374151;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    line-height: 1.4;
 }
 
 .stansiya-row label .dot {
