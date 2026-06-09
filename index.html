@@ -213,11 +213,8 @@
         // ---- HISOBLASH VA KO'RSATISH ----
         function hisoblashVaKorsatish() {
             // Normativlarni yangilash
-            NORMATIVLAR.En = parseFloat(document.getElementById('norm-en').value) || 0.12;
-            NORMATIVLAR.Cinf_km = parseFloat(document.getElementById('norm-cinf').value) || 850000;
             NORMATIVLAR.amort = parseFloat(document.getElementById('norm-amort').value) || 0.03;
             NORMATIVLAR.Estac = parseFloat(document.getElementById('norm-estac').value) || 120000;
-            NORMATIVLAR.tarif_tkm = parseFloat(document.getElementById('norm-tarif').value) || 900;
 
             // Yuk kiritilganligini tekshirish
             const faollar = STANSIYALAR.filter(s => s.yuk > 0);
