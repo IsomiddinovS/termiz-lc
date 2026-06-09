@@ -31,6 +31,12 @@
 
             </div>
 
+            <!-- LC MARKAZLAR yuk oqimi -->
+            <div class="panel-section">
+                <h2><span class="num" style="background:#7c3aed;">LC</span>Logistika markazlari yuk aylanmasi</h2>
+                <div id="lc-list"></div>
+            </div>
+
             <!-- MEZON 2: Normativlar -->
             <div class="panel-section">
                 <h2><span class="num">2</span>Keltirilgan xarajatlar normativlari</h2>
@@ -131,6 +137,31 @@
         let nomzodMarkerlar = [];
         let chiziqlar = [];
 
+        // LC markazlar (yuk inputi bo'lgan nomzodlar)
+        const LC_MARKAZLAR = NOMZODLAR.filter(n => 'yuk' in n);
+        const LC_RANGLAR_LIST = ['#f59e0b', '#7c3aed'];
+
+        // ---- LC INPUTLARINI CHIZISH ----
+        function lcInputlarChiz() {
+            const konteyner = document.getElementById('lc-list');
+            konteyner.innerHTML = '';
+            LC_MARKAZLAR.forEach((n, i) => {
+                const rang = LC_RANGLAR_LIST[i % LC_RANGLAR_LIST.length];
+                const div = document.createElement('div');
+                div.className = 'stansiya-row';
+                div.innerHTML = `
+                  <label>
+                    <span class="dot" style="background:${rang};border-radius:2px;"></span>
+                    ${n.nom.split('(')[0].trim()}
+                  </label>
+                  <input type="number" min="0" value="${n.yuk}"
+                    onchange="LC_MARKAZLAR[${i}].yuk = parseFloat(this.value)||0; NOMZODLAR.find(x=>x.id==='${n.id}').yuk = LC_MARKAZLAR[${i}].yuk;"
+                    placeholder="0"/>
+                `;
+                konteyner.appendChild(div);
+            });
+        }
+
         // ---- STANSIYA INPUTLARINI CHIZISH ----
         function stansiyaInputlarChiz() {
             const konteyner = document.getElementById('stansiya-list');
@@ -211,7 +242,11 @@
             }
 
             // ---- MEZON 1: COG ----
-            const cog = cogHisoblash(STANSIYALAR);
+            const barcha = [
+                ...STANSIYALAR,
+                ...LC_MARKAZLAR.filter(n => n.yuk > 0)
+            ];
+            const cog = cogHisoblash(barcha);
 
             // ---- MEZON 2: Zj ----
             const zjlar = zjHisoblash(NOMZODLAR, cog, NORMATIVLAR);
@@ -334,6 +369,7 @@
 
         // ---- ISHGA TUSHIRISH ----
         stansiyaInputlarChiz();
+        lcInputlarChiz();
         doimiyMarkerlarQoy();
 
     </script>

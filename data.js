@@ -68,6 +68,7 @@ const NOMZODLAR = [
         lon: 67.4234009,
         ty_masofa_km: 12.0,
         maydon: 1,
+        yuk: 0,
     },
     {
         id: "N5",
@@ -76,5 +77,6 @@ const NOMZODLAR = [
         lon: 67.265025,
         ty_masofa_km: 2.0,
         maydon: 1,
+        yuk: 0,
     },
 ];
