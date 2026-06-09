@@ -1,0 +1,359 @@
+/* ============================================================
+   TERMIZ MTU — ASOSIY STILLAR
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f4f8;
+    color: #1a202c;
+}
+
+/* ---- HEADER ---- */
+header {
+    background: #1e3a5f;
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+header span.badge {
+    background: #2d6a4f;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+/* ---- ASOSIY LAYOUT ---- */
+.wrapper {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    height: calc(100vh - 52px);
+}
+
+/* ---- CHAP PANEL ---- */
+.panel {
+    background: #fff;
+    border-right: 1px solid #d1d5db;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.panel-section {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 16px;
+}
+
+.panel-section h2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e3a5f;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.panel-section h2 .num {
+    background: #1e3a5f;
+    color: #fff;
+    font-size: 11px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ---- STANSIYA QATORI ---- */
+.stansiya-row {
+    display: grid;
+    grid-template-columns: 1fr 90px;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.stansiya-row label {
+    font-size: 13px;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stansiya-row label .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.stansiya-row input[type="number"] {
+    width: 100%;
+    padding: 5px 7px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #111;
+    background: #f9fafb;
+    transition: border 0.15s;
+}
+
+.stansiya-row input[type="number"]:focus {
+    outline: none;
+    border-color: #1e3a5f;
+    background: #fff;
+}
+
+/* Temiz CARGO satri */
+.cargo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #92400e;
+    font-weight: 600;
+}
+
+.cargo-row .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f59e0b;
+    flex-shrink: 0;
+}
+
+/* ---- TUGMA ---- */
+.btn-hisoblash {
+    width: calc(100% - 32px);
+    margin: 14px 16px;
+    padding: 11px;
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.3px;
+}
+
+.btn-hisoblash:hover {
+    background: #162d4a;
+}
+
+.btn-hisoblash:active {
+    background: #0f1f33;
+}
+
+/* ---- NATIJALAR ---- */
+.natija-blok {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.natija-karta {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.natija-karta.mezon2 {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.natija-karta h3 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #166534;
+    margin-bottom: 6px;
+}
+
+.natija-karta.mezon2 h3 {
+    color: #1e40af;
+}
+
+.natija-karta p {
+    font-size: 13px;
+    color: #1a202c;
+    line-height: 1.6;
+}
+
+.natija-karta p strong {
+    color: #166534;
+}
+
+.natija-karta.mezon2 p strong {
+    color: #1e40af;
+}
+
+/* Zj jadvali */
+.zj-jadval {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+.zj-jadval th {
+    background: #dbeafe;
+    color: #1e3a5f;
+    padding: 4px 6px;
+    text-align: left;
+    font-weight: 700;
+    border: 1px solid #bfdbfe;
+}
+
+.zj-jadval td {
+    padding: 4px 6px;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.zj-jadval tr.optimal {
+    background: #dcfce7;
+    font-weight: 700;
+}
+
+.zj-jadval tr.optimal td {
+    color: #166534;
+}
+
+/* Xato xabari */
+.xato {
+    padding: 10px 12px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #991b1b;
+    margin: 0 16px;
+}
+
+/* ---- XARITA ---- */
+#xarita {
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* Leaflet popup uslubi */
+.leaflet-popup-content {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    min-width: 160px;
+}
+
+.leaflet-popup-content b {
+    display: block;
+    margin-bottom: 4px;
+    color: #1e3a5f;
+    font-size: 14px;
+}
+
+.leaflet-popup-content span {
+    color: #4b5563;
+    font-size: 12px;
+}
+
+/* COG marker pulsatsiya */
+@keyframes puls {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+    }
+
+    70% {
+        box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.cog-marker-inner {
+    width: 20px;
+    height: 20px;
+    background: #ef4444;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    animation: puls 2s infinite;
+}
+
+/* ---- IZOH ---- */
+.izoh {
+    position: absolute;
+    bottom: 28px;
+    right: 10px;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    min-width: 160px;
+}
+
+.izoh h4 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.izoh-qator {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 4px;
+    color: #4b5563;
+}
+
+.izoh-qator .rang {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.izoh-qator .rang.kvadrat {
+    border-radius: 2px;
+}

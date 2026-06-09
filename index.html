@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Termiz MTU — Optimal LC</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <header>
+        <h1>Termiz MTU — Optimal Logistika Markazi</h1>
+        <span class="badge">2 mezon</span>
+    </header>
+
+    <div class="wrapper">
+
+        <!-- ===== CHAP PANEL ===== -->
+        <div class="panel">
+
+            <!-- MEZON 1: Stansiyalar yuk oqimi -->
+            <div class="panel-section">
+                <h2><span class="num">1</span>Stansiyalar yuk oqimi (tonna/yil)</h2>
+
+                <div id="stansiya-list">
+                    <!-- JS tomonidan to'ldiriladi -->
+                </div>
+
+                <div class="cargo-row" style="margin-top:10px;">
+                    <div class="dot"></div>
+                    <div>
+                        <div style="font-size:12px;font-weight:700;">Temiz CARGO</div>
+                        <div style="font-size:11px;color:#78350f;">Avtomobil LC — xaritada ko'rsatiladi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEZON 2: Normativlar -->
+            <div class="panel-section">
+                <h2><span class="num">2</span>Keltirilgan xarajatlar normativlari</h2>
+
+                <div class="stansiya-row">
+                    <label>En (samaradorlik normativi)</label>
+                    <input type="number" id="norm-en" step="0.01" value="0.12" />
+                </div>
+                <div class="stansiya-row">
+                    <label>Cinf (ming so'm/km)</label>
+                    <input type="number" id="norm-cinf" value="850000" />
+                </div>
+                <div class="stansiya-row">
+                    <label>Amortizatsiya (ulush)</label>
+                    <input type="number" id="norm-amort" step="0.01" value="0.03" />
+                </div>
+                <div class="stansiya-row">
+                    <label>Estac (ming so'm/yil)</label>
+                    <input type="number" id="norm-estac" value="120000" />
+                </div>
+                <div class="stansiya-row">
+                    <label>Tarif (so'm/t-km)</label>
+                    <input type="number" id="norm-tarif" value="900" />
+                </div>
+            </div>
+
+            <!-- HISOBLASH TUGMASI -->
+            <button class="btn-hisoblash" onclick="hisoblashVaKorsatish()">
+                ▶ Hisoblash
+            </button>
+
+            <!-- NATIJALAR -->
+            <div id="natijalar" class="natija-blok" style="display:none;"></div>
+
+        </div>
+
+        <!-- ===== XARITA ===== -->
+        <div style="position:relative;">
+            <div id="xarita"></div>
+
+            <!-- Izoh -->
+            <div class="izoh">
+                <h4>Izoh</h4>
+                <div class="izoh-qator">
+                    <div class="rang" style="background:#3b82f6;"></div>
+                    <span>TY stansiyasi</span>
+                </div>
+                <div class="izoh-qator">
+                    <div class="rang" style="background:#f59e0b;"></div>
+                    <span>Temiz CARGO (avto LC)</span>
+                </div>
+                <div class="izoh-qator">
+                    <div class="rang" style="background:#ef4444;"></div>
+                    <span>COG markazi (Mezon 1)</span>
+                </div>
+                <div class="izoh-qator">
+                    <div class="rang kvadrat" style="background:#16a34a;"></div>
+                    <span>Optimal LC (Mezon 2)</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== SKRIPTLAR ===== -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="data.js"></script>
+    <script src="calculations.js"></script>
+    <script>
+
+        // ---- RANGLAR ----
+        const RANGLAR = [
+            '#3b82f6', '#8b5cf6', '#06b6d4', '#10b981',
+            '#f97316', '#ec4899', '#14b8a6'
+        ];
+
+        // ---- XARITA BOSHLASH ----
+        const xarita = L.map('xarita', {
+            center: [37.9, 67.7],
+            zoom: 8,
+            scrollWheelZoom: true
+        });
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap © CARTO',
+            maxZoom: 18
+        }).addTo(xarita);
+
+        // ---- MARKERLAR UCHUN O'ZGARUVCHILAR ----
+        let stansiyaMarkerlar = [];
+        let cargoMarker = null;
+        let cogMarker = null;
+        let cogDoira = null;
+        let nomzodMarkerlar = [];
+        let chiziqlar = [];
+
+        // ---- STANSIYA INPUTLARINI CHIZISH ----
+        function stansiyaInputlarChiz() {
+            const konteyner = document.getElementById('stansiya-list');
+            konteyner.innerHTML = '';
+
+            STANSIYALAR.forEach((s, i) => {
+                const rang = RANGLAR[i % RANGLAR.length];
+                const div = document.createElement('div');
+                div.className = 'stansiya-row';
+                div.innerHTML = `
+      <label>
+        <span class="dot" style="background:${rang};"></span>
+        ${s.nom}
+      </label>
+      <input type="number" min="0" value="${s.yuk}"
+        onchange="STANSIYALAR[${i}].yuk = parseFloat(this.value)||0"
+        placeholder="0"/>
+    `;
+                konteyner.appendChild(div);
+            });
+        }
+
+        // ---- DOIMIY MARKERLARNI QO'YISH ----
+        function doimiyMarkerlarQoy() {
+            // TY stansiyalari
+            STANSIYALAR.forEach((s, i) => {
+                const rang = RANGLAR[i % RANGLAR.length];
+                const marker = L.circleMarker([s.lat, s.lon], {
+                    radius: 8,
+                    fillColor: rang,
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.9
+                }).addTo(xarita);
+
+                marker.bindPopup(`
+      <b>${s.nom}</b>
+      <span>TY stansiyasi<br>
+      Koordinata: ${s.lat.toFixed(4)}, ${s.lon.toFixed(4)}</span>
+    `);
+                stansiyaMarkerlar.push(marker);
+            });
+
+            // Temiz CARGO
+            const cargoIcon = L.divIcon({
+                className: '',
+                html: `<div style="
+      width:14px;height:14px;
+      background:#f59e0b;
+      border:2px solid #fff;
+      border-radius:3px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.3);
+    "></div>`,
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            });
+
+            cargoMarker = L.marker([TEMIZ_CARGO.lat, TEMIZ_CARGO.lon], {
+                icon: cargoIcon
+            }).addTo(xarita);
+
+            cargoMarker.bindPopup(`
+    <b>${TEMIZ_CARGO.nom}</b>
+    <span>Avtomobil LC<br>
+    Koordinata: ${TEMIZ_CARGO.lat.toFixed(4)}, ${TEMIZ_CARGO.lon.toFixed(4)}</span>
+  `);
+        }
+
+        // ---- HISOBLASH VA KO'RSATISH ----
+        function hisoblashVaKorsatish() {
+            // Normativlarni yangilash
+            NORMATIVLAR.En = parseFloat(document.getElementById('norm-en').value) || 0.12;
+            NORMATIVLAR.Cinf_km = parseFloat(document.getElementById('norm-cinf').value) || 850000;
+            NORMATIVLAR.amort = parseFloat(document.getElementById('norm-amort').value) || 0.03;
+            NORMATIVLAR.Estac = parseFloat(document.getElementById('norm-estac').value) || 120000;
+            NORMATIVLAR.tarif_tkm = parseFloat(document.getElementById('norm-tarif').value) || 900;
+
+            // Yuk kiritilganligini tekshirish
+            const faollar = STANSIYALAR.filter(s => s.yuk > 0);
+            if (faollar.length < 2) {
+                document.getElementById('natijalar').style.display = 'flex';
+                document.getElementById('natijalar').innerHTML =
+                    '<div class="xato">Kamida 2 ta stansiyaga yuk oqimi kiriting.</div>';
+                eski_tozalash();
+                return;
+            }
+
+            // ---- MEZON 1: COG ----
+            const cog = cogHisoblash(STANSIYALAR);
+
+            // ---- MEZON 2: Zj ----
+            const zjlar = zjHisoblash(NOMZODLAR, cog, NORMATIVLAR);
+            const optimal = optimalNomzod(zjlar);
+
+            // Eski natija markerlarini tozalash
+            eski_tozalash();
+
+            // COG marker
+            const cogIcon = L.divIcon({
+                className: '',
+                html: `<div class="cog-marker-inner"></div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            cogMarker = L.marker([cog.lat0, cog.lon0], { icon: cogIcon, zIndexOffset: 1000 })
+                .addTo(xarita);
+            cogMarker.bindPopup(`
+    <b>COG — Og'irlik markazi</b>
+    <span>Mezon 1 natijasi<br>
+    Lat: ${cog.lat0.toFixed(5)}<br>
+    Lon: ${cog.lon0.toFixed(5)}<br>
+    Jami yuk: ${cog.sumQ.toLocaleString()} t/yil</span>
+  `);
+
+            // COG dan stansiyalarga chiziqlar
+            cog.masofalar.forEach((m, i) => {
+                const chiziq = L.polyline(
+                    [[cog.lat0, cog.lon0], [m.lat, m.lon]],
+                    { color: RANGLAR[i % RANGLAR.length], weight: 1.5, dashArray: '5,5', opacity: 0.7 }
+                ).addTo(xarita);
+                chiziqlar.push(chiziq);
+            });
+
+            // Nomzod markerlar
+            zjlar.forEach(n => {
+                const isOptimal = optimal && n.id === optimal.id;
+                const marker = L.circleMarker([n.lat, n.lon], {
+                    radius: isOptimal ? 13 : 9,
+                    fillColor: isOptimal ? '#16a34a' : '#6b7280',
+                    color: '#fff',
+                    weight: 2.5,
+                    fillOpacity: 0.9,
+                    zIndexOffset: isOptimal ? 500 : 0
+                }).addTo(xarita);
+
+                marker.bindPopup(`
+      <b>${n.nom}</b>
+      <span>${isOptimal ? '✅ OPTIMAL (min Zj)' : 'Nomzod'}<br>
+      COG dan: ${n.li.toFixed(1)} km<br>
+      Zj: ${Math.round(n.Zj).toLocaleString()} ming so'm/yil<br>
+      TY ga yaqinlik: ${n.ty_masofa_km} km</span>
+    `);
+                nomzodMarkerlar.push(marker);
+            });
+
+            // Xaritani COG ga yo'naltirish
+            xarita.setView([cog.lat0, cog.lon0], 9);
+
+            // Natijalarni ko'rsatish
+            natijalarKorsatish(cog, zjlar, optimal);
+        }
+
+        // ---- NATIJALAR PANELI ----
+        function natijalarKorsatish(cog, zjlar, optimal) {
+            const blok = document.getElementById('natijalar');
+            blok.style.display = 'flex';
+
+            // Zj jadvali qatorlari
+            const jadvalQatorlar = zjlar.map(n => `
+    <tr class="${optimal && n.id === optimal.id ? 'optimal' : ''}">
+      <td>${n.nom.split('(')[0].trim()}</td>
+      <td>${n.li.toFixed(1)}</td>
+      <td>${Math.round(n.Zj).toLocaleString()}</td>
+    </tr>
+  `).join('');
+
+            blok.innerHTML = `
+    <div class="natija-karta">
+      <h3>Mezon 1 — COG natijasi</h3>
+      <p>
+        <strong>Koordinata:</strong><br>
+        Lat: ${cog.lat0.toFixed(5)}<br>
+        Lon: ${cog.lon0.toFixed(5)}<br>
+        <strong>Jami yuk:</strong> ${cog.sumQ.toLocaleString()} t/yil
+      </p>
+    </div>
+
+    <div class="natija-karta mezon2">
+      <h3>Mezon 2 — Keltirilgan xarajatlar (Zj)</h3>
+      <table class="zj-jadval">
+        <thead>
+          <tr>
+            <th>Nomzod</th>
+            <th>Li (km)</th>
+            <th>Zj (ming so'm)</th>
+          </tr>
+        </thead>
+        <tbody>${jadvalQatorlar}</tbody>
+      </table>
+      ${optimal ? `
+        <p style="margin-top:8px;">
+          <strong>Optimal:</strong> ${optimal.nom.split('(')[0].trim()}<br>
+          Zj min = ${Math.round(optimal.Zj).toLocaleString()} ming so'm/yil
+        </p>` : ''}
+    </div>
+  `;
+        }
+
+        // ---- ESKI NATIJA MARKERLARNI TOZALASH ----
+        function eski_tozalash() {
+            if (cogMarker) { xarita.removeLayer(cogMarker); cogMarker = null; }
+            if (cogDoira) { xarita.removeLayer(cogDoira); cogDoira = null; }
+            chiziqlar.forEach(c => xarita.removeLayer(c));
+            chiziqlar = [];
+            nomzodMarkerlar.forEach(m => xarita.removeLayer(m));
+            nomzodMarkerlar = [];
+        }
+
+        // ---- ISHGA TUSHIRISH ----
+        stansiyaInputlarChiz();
+        doimiyMarkerlarQoy();
+
+    </script>
+</body>
+
+</html>
