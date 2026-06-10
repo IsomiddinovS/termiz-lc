@@ -53,8 +53,8 @@ const NOMZODLAR = [
     {
         id: "N6",
         nom: "Termiz stansiyasi (mavjud TY st.)",
-        lat: 37.2240,
-        lon: 67.2780,
+        lat: 37.2511428,
+        lon: 67.2860679,
         ty_masofa_km: 0.1,
         maydon: 1,
     },
