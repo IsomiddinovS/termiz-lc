@@ -344,8 +344,11 @@
             const blok = document.getElementById('natijalar');
             blok.style.display = 'flex';
 
+            // WSM balliga ko'ra saralab, eng yuqori 3 tasini olish
+            const top3 = [...wsmlar].sort((a, b) => b.wsm - a.wsm).slice(0, 3);
+
             // WSM jadvali qatorlari
-            const wsmQatorlar = wsmlar.map(n => `
+            const wsmQatorlar = top3.map(n => `
                 <tr class="${optimal && n.id === optimal.id ? 'wsm-optimal' : ''}">
                   <td>${n.nom.split('(')[0].trim()}</td>
                   <td>${n.li.toFixed(1)}</td>
