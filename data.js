@@ -7,7 +7,7 @@ const STANSIYALAR = [
     { id: 1, nom: "G'alaba", lat: 37.252996, lon: 67.389353, yuk: 0 },
     { id: 2, nom: "Jarqo'rg'on", lat: 37.500986, lon: 67.404431, yuk: 0 },
     { id: 3, nom: "Qumqo'rg'on", lat: 37.838248, lon: 67.590897, yuk: 0 },
-    { id: 4, nom: "Darband", lat: 38.152622, lon: 67.005627, yuk: 0 },
+    { id: 4, nom: "Darband", lat: 38.176003, lon: 67.035242, yuk: 0 },
     { id: 5, nom: "Sariosiyo", lat: 38.367523, lon: 68.009133, yuk: 0 },
     { id: 6, nom: "Denov", lat: 38.271919, lon: 67.906294, yuk: 0 },
     { id: 7, nom: "Quduqli", lat: 38.4601, lon: 68.13805, yuk: 0 },
