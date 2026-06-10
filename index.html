@@ -348,16 +348,21 @@
             const top3 = [...wsmlar].sort((a, b) => b.wsm - a.wsm).slice(0, 3);
 
             // WSM jadvali qatorlari
-            const wsmQatorlar = top3.map(n => `
-                <tr class="${optimal && n.id === optimal.id ? 'wsm-optimal' : ''}">
-                  <td>${n.nom.split('(')[0].trim()}</td>
+            const wsmQatorlar = top3.map(n => {
+                const isOptimal = optimal && n.id === optimal.id;
+                const ballCell = n.cheklov
+                    ? `<td style="background:#fef9c3;color:#92400e;font-weight:700;">⚠️ Cheklov</td>`
+                    : `<td><strong>${n.wsm.toFixed(3)}</strong></td>`;
+                return `
+                <tr class="${isOptimal ? 'wsm-optimal' : ''}" style="${n.cheklov ? 'background:#fef9c3;' : ''}">
+                  <td>${n.nom.split('(')[0].trim()}${n.cheklov ? `<br><span style="font-size:10px;color:#92400e;">${n.cheklov_sabab}</span>` : ''}</td>
                   <td>${n.li.toFixed(1)}</td>
                   <td>${Math.round(n.Zj).toLocaleString()}</td>
                   <td>${n.chegara_km.toFixed(1)}</td>
                   <td>${n.aeroport_km.toFixed(1)}</td>
-                  <td><strong>${n.wsm.toFixed(3)}</strong></td>
-                </tr>
-            `).join('');
+                  ${ballCell}
+                </tr>`;
+            }).join('');
 
             blok.innerHTML = `
     <div class="natija-karta">

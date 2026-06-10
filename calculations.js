@@ -117,25 +117,32 @@ function wsmHisoblash(zjNatijalar, aeroportlar, chegaralar) {
     const chegaraNorm = normalizatsiya(kengaytirilgan.map(n => n.chegara_km));
     const aeroportNorm= normalizatsiya(kengaytirilgan.map(n => n.aeroport_km));
 
-    return kengaytirilgan.map((n, i) => ({
-        ...n,
-        zj_norm:       +zjNorm[i].toFixed(4),
-        cog_norm:      +cogNorm[i].toFixed(4),
-        chegara_norm:  +chegaraNorm[i].toFixed(4),
-        aeroport_norm: +aeroportNorm[i].toFixed(4),
-        wsm: +(
+    return kengaytirilgan.map((n, i) => {
+        const ball = n.cheklov === true ? 0 : +(
             0.35 * zjNorm[i] +
             0.25 * cogNorm[i] +
             0.25 * chegaraNorm[i] +
             0.15 * aeroportNorm[i]
-        ).toFixed(4),
-    }));
+        ).toFixed(4);
+
+        return {
+            ...n,
+            zj_norm:       +zjNorm[i].toFixed(4),
+            cog_norm:      +cogNorm[i].toFixed(4),
+            chegara_norm:  +chegaraNorm[i].toFixed(4),
+            aeroport_norm: +aeroportNorm[i].toFixed(4),
+            wsm: ball,
+        };
+    });
 }
 
 // -------------------------------------------------------
 // YORDAMCHI: Eng yuqori WSM balli nomzodni topish
+// cheklov: true bo'lgan nomzodlar inobatga olinmaydi
 // -------------------------------------------------------
 function optimalWsm(wsmNatijalar) {
     if (!wsmNatijalar || wsmNatijalar.length === 0) return null;
-    return wsmNatijalar.reduce((max, n) => (n.wsm > max.wsm ? n : max));
+    const faollar = wsmNatijalar.filter(n => !n.cheklov);
+    if (faollar.length === 0) return null;
+    return faollar.reduce((max, n) => (n.wsm > max.wsm ? n : max));
 }

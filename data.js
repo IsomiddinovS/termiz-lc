@@ -61,6 +61,8 @@ const NOMZODLAR = [
         lon: 67.389353,
         ty_masofa_km: 0.4,
         maydon: 1,
+        cheklov: true,
+        cheklov_sabab: "3 ta temir yo'l liniyasi kesishmasi — tirbandlik xavfi yuqori. Chegaraga yaqinligi tufayli xalqaro yuk oqimi bilan to'qnashuv ehtimoli bor.",
     },
     {
         id: "N4",
