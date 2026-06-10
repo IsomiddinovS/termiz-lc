@@ -19,20 +19,11 @@ const STANSIYALAR = [
 // O'zbekiston respublika normativlari va bozor ko'rsatkichlari
 // ============================================================
 const NORMATIVLAR = {
-    // Kapital qo'yilmalar samaradorlik normativi (TY sohasi)
-    En: 0.12,
-
-    // 1 km infratuzilma qurish tannarxi (ming so'm/km)
-    Cinf_km: 850000,
-
     // Amortizatsiya normativi (yillik, ulush)
     amort: 0.03,
 
     // Yillik ekspluatatsiya xarajati (stansiyani saqlash), ming so'm/yil
     Estac: 120000,
-
-    // Transport tarifi (so'm/tonna-km)
-    tarif_tkm: 900,
 };
 
 // Xalqaro aeroport

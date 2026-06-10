@@ -31,35 +31,30 @@ function cogHisoblash(stansiyalar) {
 // -------------------------------------------------------
 // MEZON 2: Keltirilgan xarajatlar minimumi
 // Formula:
-//   Zj = (Etash_j + Estac + Einf_j) + En * (Kinf_j)
+//   Zj = Etash + Estac + Einf
 //
-// Etash_j  = tarif * sumQ * Li_j   (tashish xarajati)
-// Kinf_j   = Cinf_km * ty_masofa   (infratuzilma kapital xarajati)
-// Einf_j   = Kinf_j * amort        (yillik amortizatsiya)
+// Etash  = COG dan nomzodga masofa (km)   (tashish xarajati o'rnida)
+// Einf   = Estac * amort                  (yillik amortizatsiya)
 // -------------------------------------------------------
 function zjHisoblash(nomzodlar, cogNatija, normativlar) {
     if (!cogNatija) return [];
 
-    const { En, Cinf_km, amort, Estac, tarif_tkm } = normativlar;
+    const { amort, Estac } = normativlar;
 
     return nomzodlar.map(n => {
         // Nomzod joy bilan COG o'rtasidagi masofa (km)
         const li = xaversine(cogNatija.lat0, cogNatija.lon0, n.lat, n.lon);
 
-        // Tashish xarajati: tarif * jami yuk (tonna) * masofa
-        // yuk — tonna/yil (ming so'm hisobi uchun / 1000)
-        const Etash = (tarif_tkm * cogNatija.sumQ * li) / 1000;
-
-        // Infratuzilma kapital xarajati
-        const Kinf = Cinf_km * n.ty_masofa_km;
+        // Tashish xarajati (masofa asosida)
+        const Etash = li;
 
         // Yillik amortizatsiya
-        const Einf = Kinf * amort;
+        const Einf = Estac * amort;
 
         // Keltirilgan xarajatlar
-        const Zj = Etash + Estac + Einf + En * Kinf;
+        const Zj = Etash + Estac + Einf;
 
-        return { ...n, li, Etash, Kinf, Einf, Zj };
+        return { ...n, li, Etash, Einf, Zj };
     });
 }
 
