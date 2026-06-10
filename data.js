@@ -57,6 +57,5 @@ const NOMZODLAR = [
         lon: 67.2780,
         ty_masofa_km: 0.1,
         maydon: 1,
-        yuk: 0,
     },
 ];

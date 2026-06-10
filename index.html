@@ -145,9 +145,12 @@
         let nomzodMarkerlar = [];
         let chiziqlar = [];
 
-        // LC markazlar (yuk inputi bo'lgan nomzodlar)
-        const LC_MARKAZLAR = NOMZODLAR.filter(n => 'yuk' in n);
-        const LC_RANGLAR_LIST = ['#f59e0b', '#7c3aed'];
+        // LC markazlar — yuk aylanmasi inputi uchun (NOMZODLAR dan mustaqil)
+        const LC_MARKAZLAR = [
+            { id: "LC_LM",    nom: "Termiz logistik markazi", lat: 37.245481,  lon: 67.265025,  yuk: 0 },
+            { id: "LC_CARGO", nom: "Termiz Cargo Center",     lat: 37.2541249, lon: 67.4234009, yuk: 0 },
+        ];
+        const LC_RANGLAR_LIST = ['#7c3aed', '#f59e0b'];
 
         // ---- LC INPUTLARINI CHIZISH ----
         function lcInputlarChiz() {
@@ -163,7 +166,7 @@
                     ${n.nom.split('(')[0].trim()}
                   </label>
                   <input type="number" min="0" value="${n.yuk}"
-                    onchange="LC_MARKAZLAR[${i}].yuk = parseFloat(this.value)||0; NOMZODLAR.find(x=>x.id==='${n.id}').yuk = LC_MARKAZLAR[${i}].yuk;"
+                    onchange="LC_MARKAZLAR[${i}].yuk = parseFloat(this.value)||0"
                     placeholder="0"/>
                 `;
                 konteyner.appendChild(div);
