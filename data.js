@@ -26,6 +26,9 @@ const NORMATIVLAR = {
     Estac: 120000,
 };
 
+// Termiz Cargo Center koordinatasi (infratuzilma uchburchagi uchun)
+const CARGO_CENTER_COORDS = { lat: 37.2541249, lon: 67.4234009 };
+
 // Xalqaro aeroport
 const AEROPORTLAR = [
     { id: "A1", nom: "Termiz xalqaro aeroporti", lat: 37.2875, lon: 67.3103 },
@@ -39,46 +42,20 @@ const CHEGARA_PUNKTLAR = [
 // Nomzod joylar (Mezon 2 uchun — Zj hisoblash)
 const NOMZODLAR = [
     {
-        id: "N1",
-        nom: "Jarqo'rg'on (mavjud TY st.)",
-        lat: 37.500986,
-        lon: 67.404431,
-        ty_masofa_km: 0.5,
-        maydon: 1,
-    },
-    {
-        id: "N2",
-        nom: "Qumqo'rg'on (mavjud TY st.)",
-        lat: 37.838248,
-        lon: 67.590897,
-        ty_masofa_km: 0.3,
-        maydon: 1,
-    },
-    {
-        id: "N3",
-        nom: "G'alaba (mavjud TY st.)",
-        lat: 37.252996,
-        lon: 67.389353,
-        ty_masofa_km: 0.4,
-        maydon: 1,
-        cheklov: true,
-        cheklov_sabab: "3 ta temir yo'l liniyasi kesishmasi — tirbandlik xavfi yuqori. Chegaraga yaqinligi tufayli xalqaro yuk oqimi bilan to'qnashuv ehtimoli bor.",
-    },
-    {
-        id: "N4",
-        nom: "Termiz Cargo Center (avto LC)",
-        lat: 37.2541249,
-        lon: 67.4234009,
-        ty_masofa_km: 12.0,
-        maydon: 1,
-        yuk: 0,
-    },
-    {
         id: "N5",
         nom: "Termiz logistik markazi (TY LC)",
         lat: 37.245481,
         lon: 67.265025,
         ty_masofa_km: 2.0,
+        maydon: 1,
+        yuk: 0,
+    },
+    {
+        id: "N6",
+        nom: "Termiz stansiyasi (mavjud TY st.)",
+        lat: 37.2240,
+        lon: 67.2780,
+        ty_masofa_km: 0.1,
         maydon: 1,
         yuk: 0,
     },

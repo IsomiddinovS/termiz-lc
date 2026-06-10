@@ -97,6 +97,10 @@
                     <div class="rang kvadrat" style="background:#111827;"></div>
                     <span>Chegara punkti</span>
                 </div>
+                <div class="izoh-qator">
+                    <div class="rang" style="background:#3b82f6;opacity:0.6;"></div>
+                    <span>Infratuzilma uchburchagi</span>
+                </div>
             </div>
         </div>
 
@@ -209,6 +213,32 @@
                 stansiyaMarkerlar.push(marker);
             });
 
+            // Infratuzilma uchburchagi
+            const termizLM   = NOMZODLAR.find(n => n.id === 'N5');
+            const aeroport   = AEROPORTLAR[0];
+            const cargo      = CARGO_CENTER_COORDS;
+            const infraLat   = (cargo.lat + aeroport.lat + termizLM.lat) / 3;
+            const infraLon   = (cargo.lon + aeroport.lon + termizLM.lon) / 3;
+
+            L.polygon([
+                [cargo.lat,    cargo.lon],
+                [aeroport.lat, aeroport.lon],
+                [termizLM.lat, termizLM.lon],
+            ], {
+                color: '#3b82f6',
+                weight: 1.5,
+                fillColor: '#3b82f6',
+                fillOpacity: 0.08,
+            }).addTo(xarita).bindPopup('<b>Infratuzilma uchburchagi</b><span>Termiz Cargo Center · Aeroport · LM</span>');
+
+            L.circleMarker([infraLat, infraLon], {
+                radius: 5,
+                fillColor: '#3b82f6',
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 0.9,
+            }).addTo(xarita).bindPopup(`<b>Infratuzilma markazi</b><span>Lat: ${infraLat.toFixed(4)}<br>Lon: ${infraLon.toFixed(4)}</span>`);
+
             // Aeroport markerlari
             AEROPORTLAR.forEach(a => {
                 const icon = L.divIcon({
@@ -277,7 +307,14 @@
             const zjlar = zjHisoblash(NOMZODLAR, cog, NORMATIVLAR);
 
             // ---- WSM: Ko'p mezonli baholash ----
-            const wsmlar = wsmHisoblash(zjlar, AEROPORTLAR, CHEGARA_PUNKTLAR);
+            const lmN5      = NOMZODLAR.find(n => n.id === 'N5');
+            const ap        = AEROPORTLAR[0];
+            const cc        = CARGO_CENTER_COORDS;
+            const infraMarkaz = {
+                lat: (cc.lat + ap.lat + lmN5.lat) / 3,
+                lon: (cc.lon + ap.lon + lmN5.lon) / 3,
+            };
+            const wsmlar = wsmHisoblash(zjlar, AEROPORTLAR, CHEGARA_PUNKTLAR, infraMarkaz);
             const optimal = optimalWsm(wsmlar);
 
             // Eski natija markerlarini tozalash
@@ -360,6 +397,7 @@
                   <td>${Math.round(n.Zj).toLocaleString()}</td>
                   <td>${n.chegara_km.toFixed(1)}</td>
                   <td>${n.aeroport_km.toFixed(1)}</td>
+                  <td>${n.infra_km.toFixed(1)}</td>
                   ${ballCell}
                 </tr>`;
             }).join('');
@@ -385,6 +423,7 @@
             <th>Zj (ming so'm)</th>
             <th>Chegara (km)</th>
             <th>Aeroport (km)</th>
+            <th>Infra uchburchak (km)</th>
             <th>WSM ball</th>
           </tr>
         </thead>

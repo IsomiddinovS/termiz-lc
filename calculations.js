@@ -95,12 +95,13 @@ function normalizatsiya(qiymatlar) {
 
 // -------------------------------------------------------
 // WSM (Weighted Sum Model) hisoblash
-// Vaznlar: Zj=0.35, COG=0.25, chegara=0.25, aeroport=0.15
+// Vaznlar: Zj=0.30, COG=0.22, Chegara=0.23, Aeroport=0.15, Infra=0.10
+// infraMarkaz: { lat, lon } — infratuzilma uchburchagi geometrik markazi
 // -------------------------------------------------------
-function wsmHisoblash(zjNatijalar, aeroportlar, chegaralar) {
+function wsmHisoblash(zjNatijalar, aeroportlar, chegaralar, infraMarkaz) {
     if (!zjNatijalar || zjNatijalar.length === 0) return [];
 
-    // Har bir nomzod uchun aeroport va chegaraga eng yaqin masofa
+    // Har bir nomzod uchun masofalarni hisoblash
     const kengaytirilgan = zjNatijalar.map(n => {
         const aeroport_km = Math.min(
             ...aeroportlar.map(a => xaversine(n.lat, n.lon, a.lat, a.lon))
@@ -108,7 +109,10 @@ function wsmHisoblash(zjNatijalar, aeroportlar, chegaralar) {
         const chegara_km = Math.min(
             ...chegaralar.map(c => xaversine(n.lat, n.lon, c.lat, c.lon))
         );
-        return { ...n, aeroport_km, chegara_km };
+        const infra_km = infraMarkaz
+            ? xaversine(n.lat, n.lon, infraMarkaz.lat, infraMarkaz.lon)
+            : 0;
+        return { ...n, aeroport_km, chegara_km, infra_km };
     });
 
     // Har bir mezon bo'yicha normalizatsiya (kichik = yaxshi)
@@ -116,13 +120,15 @@ function wsmHisoblash(zjNatijalar, aeroportlar, chegaralar) {
     const cogNorm     = normalizatsiya(kengaytirilgan.map(n => n.li));
     const chegaraNorm = normalizatsiya(kengaytirilgan.map(n => n.chegara_km));
     const aeroportNorm= normalizatsiya(kengaytirilgan.map(n => n.aeroport_km));
+    const infraNorm   = normalizatsiya(kengaytirilgan.map(n => n.infra_km));
 
     return kengaytirilgan.map((n, i) => {
         const ball = n.cheklov === true ? 0 : +(
-            0.35 * zjNorm[i] +
-            0.25 * cogNorm[i] +
-            0.25 * chegaraNorm[i] +
-            0.15 * aeroportNorm[i]
+            0.30 * zjNorm[i] +
+            0.22 * cogNorm[i] +
+            0.23 * chegaraNorm[i] +
+            0.15 * aeroportNorm[i] +
+            0.10 * infraNorm[i]
         ).toFixed(4);
 
         return {
@@ -131,6 +137,7 @@ function wsmHisoblash(zjNatijalar, aeroportlar, chegaralar) {
             cog_norm:      +cogNorm[i].toFixed(4),
             chegara_norm:  +chegaraNorm[i].toFixed(4),
             aeroport_norm: +aeroportNorm[i].toFixed(4),
+            infra_norm:    +infraNorm[i].toFixed(4),
             wsm: ball,
         };
     });
