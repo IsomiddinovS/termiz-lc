@@ -35,6 +35,16 @@ const NORMATIVLAR = {
     tarif_tkm: 900,
 };
 
+// Xalqaro aeroport
+const AEROPORTLAR = [
+    { id: "A1", nom: "Termiz xalqaro aeroporti", lat: 37.2875, lon: 67.3103 },
+];
+
+// Chegara punktlari
+const CHEGARA_PUNKTLAR = [
+    { id: "CP1", nom: "Hayraton (Afgʻoniston)", lat: 37.214708, lon: 67.419886 },
+];
+
 // Nomzod joylar (Mezon 2 uchun — Zj hisoblash)
 const NOMZODLAR = [
     {

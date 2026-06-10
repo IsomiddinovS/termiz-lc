@@ -89,6 +89,14 @@
                     <div class="rang kvadrat" style="background:#7c3aed;"></div>
                     <span>TY LC (nomzod)</span>
                 </div>
+                <div class="izoh-qator">
+                    <div class="rang" style="background:#16a34a;"></div>
+                    <span>Xalqaro aeroport</span>
+                </div>
+                <div class="izoh-qator">
+                    <div class="rang kvadrat" style="background:#111827;"></div>
+                    <span>Chegara punkti</span>
+                </div>
             </div>
         </div>
 
@@ -201,6 +209,30 @@
                 stansiyaMarkerlar.push(marker);
             });
 
+            // Aeroport markerlari
+            AEROPORTLAR.forEach(a => {
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div class="aeroport-marker">✈</div>`,
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
+                });
+                const m = L.marker([a.lat, a.lon], { icon }).addTo(xarita);
+                m.bindPopup(`<b>${a.nom}</b><span>Xalqaro aeroport<br>Koordinata: ${a.lat.toFixed(4)}, ${a.lon.toFixed(4)}</span>`);
+            });
+
+            // Chegara punkti markerlari
+            CHEGARA_PUNKTLAR.forEach(c => {
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div class="chegara-marker"></div>`,
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
+                });
+                const m = L.marker([c.lat, c.lon], { icon }).addTo(xarita);
+                m.bindPopup(`<b>${c.nom}</b><span>Chegara punkti<br>Koordinata: ${c.lat.toFixed(4)}, ${c.lon.toFixed(4)}</span>`);
+            });
+
             // Doimiy nomzod markerlar (LC joylari)
             const LC_RANGLAR = { avto: '#f59e0b', ty: '#7c3aed' };
             NOMZODLAR.forEach(n => {
@@ -243,7 +275,10 @@
 
             // ---- MEZON 2: Zj ----
             const zjlar = zjHisoblash(NOMZODLAR, cog, NORMATIVLAR);
-            const optimal = optimalNomzod(zjlar);
+
+            // ---- WSM: Ko'p mezonli baholash ----
+            const wsmlar = wsmHisoblash(zjlar, AEROPORTLAR, CHEGARA_PUNKTLAR);
+            const optimal = optimalWsm(wsmlar);
 
             // Eski natija markerlarini tozalash
             eski_tozalash();
@@ -301,22 +336,25 @@
             xarita.setView([cog.lat0, cog.lon0], 9);
 
             // Natijalarni ko'rsatish
-            natijalarKorsatish(cog, zjlar, optimal);
+            natijalarKorsatish(cog, wsmlar, optimal);
         }
 
         // ---- NATIJALAR PANELI ----
-        function natijalarKorsatish(cog, zjlar, optimal) {
+        function natijalarKorsatish(cog, wsmlar, optimal) {
             const blok = document.getElementById('natijalar');
             blok.style.display = 'flex';
 
-            // Zj jadvali qatorlari
-            const jadvalQatorlar = zjlar.map(n => `
-    <tr class="${optimal && n.id === optimal.id ? 'optimal' : ''}">
-      <td>${n.nom.split('(')[0].trim()}</td>
-      <td>${n.li.toFixed(1)}</td>
-      <td>${Math.round(n.Zj).toLocaleString()}</td>
-    </tr>
-  `).join('');
+            // WSM jadvali qatorlari
+            const wsmQatorlar = wsmlar.map(n => `
+                <tr class="${optimal && n.id === optimal.id ? 'wsm-optimal' : ''}">
+                  <td>${n.nom.split('(')[0].trim()}</td>
+                  <td>${n.li.toFixed(1)}</td>
+                  <td>${Math.round(n.Zj).toLocaleString()}</td>
+                  <td>${n.chegara_km.toFixed(1)}</td>
+                  <td>${n.aeroport_km.toFixed(1)}</td>
+                  <td><strong>${n.wsm.toFixed(3)}</strong></td>
+                </tr>
+            `).join('');
 
             blok.innerHTML = `
     <div class="natija-karta">
@@ -329,16 +367,29 @@
       </p>
     </div>
 
-    <div class="natija-karta mezon2">
-      <h3>Mezon 2 — Eng yaxshi nomzod</h3>
+    <div class="natija-karta wsm">
+      <h3>Ko'p mezonli baholash — WSM natijasi</h3>
+      <table class="wsm-jadval">
+        <thead>
+          <tr>
+            <th>Nomzod</th>
+            <th>COG (km)</th>
+            <th>Zj (ming so'm)</th>
+            <th>Chegara (km)</th>
+            <th>Aeroport (km)</th>
+            <th>WSM ball</th>
+          </tr>
+        </thead>
+        <tbody>${wsmQatorlar}</tbody>
+      </table>
       ${optimal ? `
-        <p style="font-size:15px; font-weight:700; color:#166534; margin-bottom:6px;">
-          ✅ ${optimal.nom.split('(')[0].trim()}
-        </p>
-        <p>
-          Masofa: ${optimal.li.toFixed(1)} km<br>
-          Zj min = ${Math.round(optimal.Zj).toLocaleString()} ming so'm/yil
-        </p>` : '<p>Natija yo\'q</p>'}
+        <p style="margin-top:8px; font-size:13px;">
+          <strong>Optimal:</strong>
+          <span style="color:#4c1d95; font-weight:700;"> ✅ ${optimal.nom.split('(')[0].trim()}</span><br>
+          <span style="font-size:11px; color:#6b7280;">
+            Vaznlar: Zj=0.35 · COG=0.25 · Chegara=0.25 · Aeroport=0.15
+          </span>
+        </p>` : ''}
     </div>
   `;
         }

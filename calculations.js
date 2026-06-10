@@ -86,3 +86,61 @@ function optimalNomzod(zjNatijalar) {
     if (!zjNatijalar || zjNatijalar.length === 0) return null;
     return zjNatijalar.reduce((min, n) => (n.Zj < min.Zj ? n : min));
 }
+
+// -------------------------------------------------------
+// NORMALIZATSIYA: kichik masofa / xarajat = yuqori ball
+// Qaytaradi: 0-1 oralig'idagi massiv (1 = eng yaxshi)
+// -------------------------------------------------------
+function normalizatsiya(qiymatlar) {
+    const min = Math.min(...qiymatlar);
+    const max = Math.max(...qiymatlar);
+    if (max === min) return qiymatlar.map(() => 1);
+    return qiymatlar.map(v => 1 - (v - min) / (max - min));
+}
+
+// -------------------------------------------------------
+// WSM (Weighted Sum Model) hisoblash
+// Vaznlar: Zj=0.35, COG=0.25, chegara=0.25, aeroport=0.15
+// -------------------------------------------------------
+function wsmHisoblash(zjNatijalar, aeroportlar, chegaralar) {
+    if (!zjNatijalar || zjNatijalar.length === 0) return [];
+
+    // Har bir nomzod uchun aeroport va chegaraga eng yaqin masofa
+    const kengaytirilgan = zjNatijalar.map(n => {
+        const aeroport_km = Math.min(
+            ...aeroportlar.map(a => xaversine(n.lat, n.lon, a.lat, a.lon))
+        );
+        const chegara_km = Math.min(
+            ...chegaralar.map(c => xaversine(n.lat, n.lon, c.lat, c.lon))
+        );
+        return { ...n, aeroport_km, chegara_km };
+    });
+
+    // Har bir mezon bo'yicha normalizatsiya (kichik = yaxshi)
+    const zjNorm      = normalizatsiya(kengaytirilgan.map(n => n.Zj));
+    const cogNorm     = normalizatsiya(kengaytirilgan.map(n => n.li));
+    const chegaraNorm = normalizatsiya(kengaytirilgan.map(n => n.chegara_km));
+    const aeroportNorm= normalizatsiya(kengaytirilgan.map(n => n.aeroport_km));
+
+    return kengaytirilgan.map((n, i) => ({
+        ...n,
+        zj_norm:       +zjNorm[i].toFixed(4),
+        cog_norm:      +cogNorm[i].toFixed(4),
+        chegara_norm:  +chegaraNorm[i].toFixed(4),
+        aeroport_norm: +aeroportNorm[i].toFixed(4),
+        wsm: +(
+            0.35 * zjNorm[i] +
+            0.25 * cogNorm[i] +
+            0.25 * chegaraNorm[i] +
+            0.15 * aeroportNorm[i]
+        ).toFixed(4),
+    }));
+}
+
+// -------------------------------------------------------
+// YORDAMCHI: Eng yuqori WSM balli nomzodni topish
+// -------------------------------------------------------
+function optimalWsm(wsmNatijalar) {
+    if (!wsmNatijalar || wsmNatijalar.length === 0) return null;
+    return wsmNatijalar.reduce((max, n) => (n.wsm > max.wsm ? n : max));
+}
