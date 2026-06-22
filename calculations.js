@@ -3,7 +3,7 @@
 // ============================================================
 
 // -------------------------------------------------------
-// MEZON 1: COG (Og'irlik markazi usuli)
+// MEZON 1: COG (Optimal joylashuv nuqtasi usuli)
 // Formulalar:
 //   X0 = sum(Qi * xi) / sum(Qi)
 //   Y0 = sum(Qi * yi) / sum(Qi)
