@@ -106,8 +106,9 @@
 
     </div>
 
-    <!-- ===== HISOB-KITOB TAFSILOTLARI (TO'LIQ KENGLIKDA) ===== -->
+    <!-- ===== NATIJALAR VA HISOB-KITOB TAFSILOTLARI (TO'LIQ KENGLIKDA) ===== -->
     <div id="hisobkitob-seksiya" class="hk-seksiya" style="display:none;">
+        <div id="hisobkitob-natijalar" class="hk-natijalar"></div>
         <button id="hisobkitob-tugma" class="btn-hisobkitob" onclick="hisobKitobToggle()">
             📐 Hisob-kitob tafsilotlari — barcha formulalar va oraliq qiymatlar ▾
         </button>
@@ -390,8 +391,10 @@
 
         // ---- NATIJALAR PANELI ----
         function natijalarKorsatish(cog, wsmlar, optimal) {
-            const blok = document.getElementById('natijalar');
-            blok.style.display = 'flex';
+            // Chap paneldagi eski natija blokini bekitish — natijalar endi
+            // pastdagi to'liq kenglikdagi hisob-kitob seksiyasida ko'rsatiladi
+            document.getElementById('natijalar').style.display = 'none';
+            document.getElementById('natijalar').innerHTML = '';
 
             // WSM balliga ko'ra saralab, eng yuqori 3 tasini olish
             const top3 = [...wsmlar].sort((a, b) => b.wsm - a.wsm).slice(0, 3);
@@ -414,49 +417,54 @@
                 </tr>`;
             }).join('');
 
-            blok.innerHTML = `
-    <div class="natija-karta">
-      <h3>Mezon 1 — Optimal joylashuv nuqtasi</h3>
-      <p>
-        <strong>Koordinata:</strong><br>
-        Lat: ${cog.lat0.toFixed(5)}<br>
-        Lon: ${cog.lon0.toFixed(5)}<br>
-        <strong>Jami yuk:</strong> ${cog.sumQ.toLocaleString()} ming t/yil
-      </p>
-    </div>
+            // To'liq kenglikdagi hisob-kitob seksiyasini to'ldirish
+            const seksiya = document.getElementById('hisobkitob-seksiya');
+            const natijalarKonteyner = document.getElementById('hisobkitob-natijalar');
+            const tafsilot = document.getElementById('hisobkitob-tafsilot');
+            const tugma = document.getElementById('hisobkitob-tugma');
 
-    <div class="natija-karta wsm">
-      <h3>Ko'p mezonli baholash — WSM natijasi</h3>
-      <table class="wsm-jadval">
-        <thead>
-          <tr>
-            <th>Nomzod</th>
-            <th>COG (km)</th>
-            <th>Zj (ming so'm)</th>
-            <th>Chegara (km)</th>
-            <th>Aeroport (km)</th>
-            <th>Infra uchburchak (km)</th>
-            <th>WSM ball</th>
-          </tr>
-        </thead>
-        <tbody>${wsmQatorlar}</tbody>
-      </table>
-      ${optimal ? `
-        <p style="margin-top:8px; font-size:13px;">
-          <strong>Optimal:</strong>
-          <span style="color:#4c1d95; font-weight:700;"> ✅ ${optimal.nom.split('(')[0].trim()}</span><br>
-          <span style="font-size:11px; color:#6b7280;">
-            Vaznlar: Zj=0.35 · COG=0.25 · Chegara=0.25 · Aeroport=0.15
-          </span>
-        </p>` : ''}
+            seksiya.style.display = 'block';
+
+            natijalarKonteyner.innerHTML = `
+    <div class="hk-natijalar-grid">
+      <div class="natija-karta">
+        <h3>Mezon 1 — Optimal joylashuv nuqtasi</h3>
+        <p>
+          <strong>Koordinata:</strong><br>
+          Lat: ${cog.lat0.toFixed(5)}<br>
+          Lon: ${cog.lon0.toFixed(5)}<br>
+          <strong>Jami yuk:</strong> ${cog.sumQ.toLocaleString()} ming t/yil
+        </p>
+      </div>
+
+      <div class="natija-karta wsm">
+        <h3>Ko'p mezonli baholash — WSM natijasi</h3>
+        <table class="wsm-jadval">
+          <thead>
+            <tr>
+              <th>Nomzod</th>
+              <th>COG (km)</th>
+              <th>Zj (ming so'm)</th>
+              <th>Chegara (km)</th>
+              <th>Aeroport (km)</th>
+              <th>Infra uchburchak (km)</th>
+              <th>WSM ball</th>
+            </tr>
+          </thead>
+          <tbody>${wsmQatorlar}</tbody>
+        </table>
+        ${optimal ? `
+          <p style="margin-top:8px; font-size:13px;">
+            <strong>Optimal:</strong>
+            <span style="color:#4c1d95; font-weight:700;"> ✅ ${optimal.nom.split('(')[0].trim()}</span><br>
+            <span style="font-size:11px; color:#6b7280;">
+              Vaznlar: Zj=0.35 · COG=0.25 · Chegara=0.25 · Aeroport=0.15
+            </span>
+          </p>` : ''}
+      </div>
     </div>
   `;
 
-            // To'liq kenglikdagi hisob-kitob seksiyasini to'ldirish
-            const seksiya = document.getElementById('hisobkitob-seksiya');
-            const tafsilot = document.getElementById('hisobkitob-tafsilot');
-            const tugma = document.getElementById('hisobkitob-tugma');
-            seksiya.style.display = 'block';
             tafsilot.style.display = 'none';
             tafsilot.innerHTML = hisobKitobHTML(cog, wsmlar);
             tugma.innerHTML = '📐 Hisob-kitob tafsilotlari — barcha formulalar va oraliq qiymatlar ▾';

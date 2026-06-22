@@ -386,6 +386,33 @@ header span.badge {
     overflow: hidden;
 }
 
+.hk-natijalar {
+    padding: 28px 32px 8px;
+}
+
+.hk-natijalar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.hk-natijalar-grid .natija-karta {
+    margin: 0;
+}
+
+.hk-natijalar-grid .natija-karta h3 {
+    font-size: 13px;
+}
+
+.hk-natijalar-grid .wsm-jadval {
+    font-size: 13px;
+}
+
+.hk-natijalar-grid .wsm-jadval th,
+.hk-natijalar-grid .wsm-jadval td {
+    padding: 7px 8px;
+}
+
 .btn-hisobkitob {
     width: 100%;
     padding: 18px 28px;
