@@ -106,13 +106,13 @@
 
     </div>
 
-    <!-- ===== NATIJALAR VA HISOB-KITOB TAFSILOTLARI (TO'LIQ KENGLIKDA) ===== -->
+    <!-- ===== HISOB-KITOB TAFSILOTLARI VA NATIJALAR (TO'LIQ KENGLIKDA) ===== -->
     <div id="hisobkitob-seksiya" class="hk-seksiya" style="display:none;">
-        <div id="hisobkitob-natijalar" class="hk-natijalar"></div>
         <button id="hisobkitob-tugma" class="btn-hisobkitob" onclick="hisobKitobToggle()">
             📐 Hisob-kitob tafsilotlari — barcha formulalar va oraliq qiymatlar ▾
         </button>
         <div id="hisobkitob-tafsilot" style="display:none;"></div>
+        <div id="hisobkitob-natijalar" class="hk-natijalar"></div>
     </div>
 
     <!-- ===== SKRIPTLAR ===== -->
@@ -426,6 +426,7 @@
             seksiya.style.display = 'block';
 
             natijalarKonteyner.innerHTML = `
+    <h4>✅ Yakuniy natija</h4>
     <div class="hk-natijalar-grid">
       <div class="natija-karta">
         <h3>Mezon 1 — Optimal joylashuv nuqtasi</h3>

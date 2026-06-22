@@ -387,7 +387,16 @@ header span.badge {
 }
 
 .hk-natijalar {
-    padding: 28px 32px 8px;
+    padding: 28px 32px 32px;
+    border-top: 2px solid #e5e7eb;
+    background: #fafafa;
+}
+
+.hk-natijalar h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 14px;
 }
 
 .hk-natijalar-grid {
