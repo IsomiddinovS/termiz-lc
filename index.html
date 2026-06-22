@@ -106,6 +106,14 @@
 
     </div>
 
+    <!-- ===== HISOB-KITOB TAFSILOTLARI (TO'LIQ KENGLIKDA) ===== -->
+    <div id="hisobkitob-seksiya" class="hk-seksiya" style="display:none;">
+        <button id="hisobkitob-tugma" class="btn-hisobkitob" onclick="hisobKitobToggle()">
+            📐 Hisob-kitob tafsilotlari — barcha formulalar va oraliq qiymatlar ▾
+        </button>
+        <div id="hisobkitob-tafsilot" style="display:none;"></div>
+    </div>
+
     <!-- ===== SKRIPTLAR ===== -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="data.js"></script>
@@ -295,6 +303,7 @@
                 document.getElementById('natijalar').style.display = 'flex';
                 document.getElementById('natijalar').innerHTML =
                     '<div class="xato">Kamida 2 ta stansiyaga yuk oqimi kiriting.</div>';
+                document.getElementById('hisobkitob-seksiya').style.display = 'none';
                 eski_tozalash();
                 return;
             }
@@ -442,6 +451,140 @@
         </p>` : ''}
     </div>
   `;
+
+            // To'liq kenglikdagi hisob-kitob seksiyasini to'ldirish
+            const seksiya = document.getElementById('hisobkitob-seksiya');
+            const tafsilot = document.getElementById('hisobkitob-tafsilot');
+            const tugma = document.getElementById('hisobkitob-tugma');
+            seksiya.style.display = 'block';
+            tafsilot.style.display = 'none';
+            tafsilot.innerHTML = hisobKitobHTML(cog, wsmlar);
+            tugma.innerHTML = '📐 Hisob-kitob tafsilotlari — barcha formulalar va oraliq qiymatlar ▾';
+        }
+
+        // ---- HISOB-KITOB PANELINI OCHISH/YOPISH ----
+        function hisobKitobToggle() {
+            const el = document.getElementById('hisobkitob-tafsilot');
+            const btn = document.getElementById('hisobkitob-tugma');
+            const ochiq = el.style.display !== 'none';
+            el.style.display = ochiq ? 'none' : 'block';
+            btn.innerHTML = ochiq
+                ? '📐 Hisob-kitob tafsilotlari — barcha formulalar va oraliq qiymatlar ▾'
+                : '📐 Hisob-kitob tafsilotlari — barcha formulalar va oraliq qiymatlar ▴';
+        }
+
+        // ---- HISOB-KITOB TAFSILOTLARI (COG, HAVERSINE, WSM) ----
+        function hisobKitobHTML(cog, wsmlar) {
+            // ---- 1. COG jadvali: Qi*lat, Qi*lon, yig'indi, bo'lish ----
+            const cogQatorlar = cog.masofalar.map(m => {
+                const qlat = m.yuk * m.lat;
+                const qlon = m.yuk * m.lon;
+                return `<tr>
+          <td>${m.nom}</td>
+          <td>${m.yuk.toLocaleString()}</td>
+          <td>${m.lat.toFixed(5)}</td>
+          <td>${m.lon.toFixed(5)}</td>
+          <td>${qlat.toFixed(2)}</td>
+          <td>${qlon.toFixed(2)}</td>
+        </tr>`;
+            }).join('');
+            const sumQLat = cog.masofalar.reduce((s, m) => s + m.yuk * m.lat, 0);
+            const sumQLon = cog.masofalar.reduce((s, m) => s + m.yuk * m.lon, 0);
+
+            // ---- 2. Haversine bosqichlari: har bir nomzod uchun COG dan masofa ----
+            const haversineBloklar = wsmlar.map(n => {
+                const q = xaversineQadamlar(cog.lat0, cog.lon0, n.lat, n.lon);
+                return `
+        <div class="hk-nomzod-blok">
+          <h5>${n.nom.split('(')[0].trim()}</h5>
+          <table class="hk-jadval">
+            <tbody>
+              <tr><td>lat1, lon1 (COG)</td><td>${q.lat1.toFixed(5)}, ${q.lon1.toFixed(5)}</td></tr>
+              <tr><td>lat2, lon2 (nomzod)</td><td>${q.lat2.toFixed(5)}, ${q.lon2.toFixed(5)}</td></tr>
+              <tr><td>ΔLat (radian)</td><td>${q.dLat.toFixed(6)}</td></tr>
+              <tr><td>ΔLon (radian)</td><td>${q.dLon.toFixed(6)}</td></tr>
+              <tr><td>a = sin²(ΔLat/2) + cos(lat1)·cos(lat2)·sin²(ΔLon/2)</td><td>${q.a.toFixed(8)}</td></tr>
+              <tr><td>c = 2·atan2(√a, √(1-a))</td><td>${q.c.toFixed(8)}</td></tr>
+              <tr><td>Masofa = R · c (R=6371 km)</td><td><strong>${q.masofa.toFixed(3)} km</strong></td></tr>
+            </tbody>
+          </table>
+        </div>`;
+            }).join('');
+
+            // ---- 3. WSM: xom qiymat, normalizatsiya, vazn ko'paytmasi ----
+            const mezonlar = [
+                { key: 'Zj', label: 'Zj (keltirilgan xarajat, ming so\'m)', vazn: 0.30, normKey: 'zj_norm' },
+                { key: 'li', label: 'COG dan masofa (km)', vazn: 0.22, normKey: 'cog_norm' },
+                { key: 'chegara_km', label: 'Chegaragacha masofa (km)', vazn: 0.23, normKey: 'chegara_norm' },
+                { key: 'aeroport_km', label: 'Aeroportgacha masofa (km)', vazn: 0.15, normKey: 'aeroport_norm' },
+                { key: 'infra_km', label: 'Infra uchburchakkacha masofa (km)', vazn: 0.10, normKey: 'infra_norm' },
+            ];
+
+            const wsmBloklar = wsmlar.map(n => {
+                const qatorlar = mezonlar.map(mz => {
+                    const xom = n[mz.key];
+                    const norm = n[mz.normKey];
+                    const kopaytma = +(mz.vazn * norm).toFixed(4);
+                    return `<tr>
+            <td>${mz.label}</td>
+            <td>${xom.toFixed(2)}</td>
+            <td>${norm.toFixed(4)}</td>
+            <td>${mz.vazn}</td>
+            <td>${kopaytma}</td>
+          </tr>`;
+                }).join('');
+                return `
+        <div class="hk-nomzod-blok">
+          <h5>${n.nom.split('(')[0].trim()}</h5>
+          <table class="hk-jadval">
+            <thead>
+              <tr><th>Mezon</th><th>Xom qiymat</th><th>Norm.</th><th>Vazn</th><th>Vazn×Norm</th></tr>
+            </thead>
+            <tbody>${qatorlar}</tbody>
+            <tfoot>
+              <tr><td colspan="4">Yig'indi (WSM ball)</td><td><strong>${n.wsm.toFixed(4)}</strong></td></tr>
+            </tfoot>
+          </table>
+        </div>`;
+            }).join('');
+
+            return `
+    <div class="hk-bolim">
+
+      <h4>1️⃣ COG — Og'irlik markazi hisobi</h4>
+      <table class="hk-jadval">
+        <thead>
+          <tr><th>Stansiya</th><th>Qi (yuk)</th><th>lat</th><th>lon</th><th>Qi×lat</th><th>Qi×lon</th></tr>
+        </thead>
+        <tbody>${cogQatorlar}</tbody>
+        <tfoot>
+          <tr>
+            <td>Yig'indi (Σ)</td>
+            <td>${cog.sumQ.toLocaleString()}</td>
+            <td></td><td></td>
+            <td>${sumQLat.toFixed(2)}</td>
+            <td>${sumQLon.toFixed(2)}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <p class="hk-formula">
+        X0 = ΣQi×lati / ΣQi = ${sumQLat.toFixed(2)} / ${cog.sumQ.toLocaleString()} = <strong>${cog.lat0.toFixed(5)}</strong><br>
+        Y0 = ΣQi×loni / ΣQi = ${sumQLon.toFixed(2)} / ${cog.sumQ.toLocaleString()} = <strong>${cog.lon0.toFixed(5)}</strong>
+      </p>
+
+      <h4>2️⃣ Haversine — COG dan nomzodgacha masofa</h4>
+      <p class="hk-formula">
+        a = sin²(ΔLat/2) + cos(lat1)·cos(lat2)·sin²(ΔLon/2)<br>
+        c = 2·atan2(√a, √(1-a))<br>
+        Masofa = R·c, R = 6371 km
+      </p>
+      <div class="hk-nomzod-grid">${haversineBloklar}</div>
+
+      <h4>3️⃣ WSM — Normalizatsiya va vaznli yig'indi</h4>
+      <p class="hk-formula">Norm = 1 − (v − min) / (max − min) &nbsp; (kichik qiymat = yaxshi ball)</p>
+      <div class="hk-nomzod-grid">${wsmBloklar}</div>
+
+    </div>`;
         }
 
         // ---- ESKI NATIJA MARKERLARNI TOZALASH ----
