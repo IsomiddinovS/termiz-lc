@@ -1,0 +1,150 @@
+==========================================================
+HIMOYA NUTQI — VEB-DASTUR (DSS) TAQDIMOTI UCHUN
+Mavzu: Termiz MTU temir yo'l tugunida logistika markazini
+joylashtirish — COG va WSM metodlari
+==========================================================
+
+QO'LLANMA: Taqdimotning 1-2 betini (mavzu, dolzarblik) o'zingiz
+gapirib o'tasiz, so'ng 14-slaydga ("DSS — Web ilova") kelganda
+quyidagi nutqqa o'tib, brauzerda saytni ochasiz:
+
+   isomiddinovs.github.io/termiz-lc/
+
+----------------------------------------------------------
+1. O'TISH GAPI (slayddan veb-dasturga)
+----------------------------------------------------------
+"Hurmatli komissiya a'zolari, nazariy qismda ko'rib chiqilgan
+COG va WSM metodlarini qog'ozda qolib ketmasligi uchun, men
+ularni avtomatlashtiradigan interaktiv qaror qabul qilish
+tizimini — veb-dasturni ishlab chiqdim. Hozir uni jonli
+ko'rsatib, qanday ishlashini tushuntirib beraman."
+
+----------------------------------------------------------
+2. DASTUR ARXITEKTURASI (qisqa, texnik)
+----------------------------------------------------------
+"Dastur to'liq mustaqil ishlaydi — server yoki baza talab
+qilmaydi, faqat brauzerda ishlaydi. JavaScript va Leaflet.js
+xarita kutubxonasidan foydalanilgan. Uch qismdan iborat:
+
+  - data.js          — barcha statik ma'lumotlar: 8 ta temir
+                        yo'l stansiyasi, mavjud logistika
+                        markazlari, aeroport va chegara punkti
+                        koordinatalari, normativlar;
+  - calculations.js  — COG, Haversine va WSM formulalari
+                        yozilgan hisoblash moduli;
+  - index.html       — interfeys, xarita va natijalarni
+                        ko'rsatish."
+
+----------------------------------------------------------
+3. CHAP PANEL — MA'LUMOT KIRITISH
+----------------------------------------------------------
+"Chap tomonda foydalanuvchi har bir stansiyaning yillik yuk
+oqimini (ming tonna/yil) kiritadi. Bu — birinchi mezon uchun
+kirish ma'lumoti. Quyida esa ikkinchi mezon uchun parametrlar:
+amortizatsiya normativi va stansiyaning yillik ekspluatatsiya
+xarajati — bularni komissiya a'zosi xohlasa o'zgartirib,
+natija qanday o'zgarishini ko'rishi mumkin."
+
+   >>> Shu yerda 2-3 stansiyaga raqam kiriting, masalan:
+       Termiz = 1500, G'alaba = 850, Qumqo'rg'on = 600
+
+----------------------------------------------------------
+4. "HISOBLASH" TUGMASI — NATIJA
+----------------------------------------------------------
+"Hisoblash tugmasini bosganda dastur ketma-ket uch bosqichni
+avtomatik bajaradi:
+
+BIRINCHI BOSQICH — COG (Og'irlik markazi).
+Har bir stansiyaning yuk hajmi va koordinatasi asosida
+formula bo'yicha:
+    X0 = Sum(Qi * lati) / Sum(Qi)
+    Y0 = Sum(Qi * loni) / Sum(Qi)
+yuk oqimining 'tortishish markazi' hisoblanadi. Xaritada bu
+qizil nuqta bilan ko'rsatiladi, undan har bir stansiyaga
+chiziq tortiladi.
+
+IKKINCHI BOSQICH — Zj, keltirilgan xarajatlar.
+Har bir nomzod joy (Termiz logistik markazi va Termiz
+stansiyasi) uchun COG nuqtasidan masofa Haversine formulasi
+orqali hisoblanadi, so'ngra ekspluatatsiya va amortizatsiya
+xarajatlari qo'shilib, umumiy keltirilgan xarajat — Zj —
+topiladi.
+
+UCHINCHI BOSQICH — WSM, ko'p mezonli baholash.
+Faqat xarajat yetarli emas — beshta mezon birlashtirildi:
+    Zj (vazn 0.30)
+    COG dan masofa (vazn 0.22)
+    Chegaragacha masofa (vazn 0.23)
+    Aeroportgacha masofa (vazn 0.15)
+    Infratuzilma uchburchagigacha masofa (vazn 0.10)
+Har bir mezon normalizatsiya qilinadi — kichik qiymat yaxshi
+ball beradi — so'ng vaznlar bilan ko'paytirilib yig'indi
+hisoblanadi. Eng yuqori ball olgan nomzod xaritada yashil
+rang bilan ajratiladi."
+
+----------------------------------------------------------
+5. "HISOB-KITOB TAFSILOTLARI" BO'LIMI (ENG KUCHLI NUQTA!)
+----------------------------------------------------------
+"Komissiya savol berishini kutib, men maxsus shaffoflik uchun
+pastda 'Hisob-kitob tafsilotlari' bo'limini qo'shdim. Bu
+bo'limni ochsangiz, har bir oraliq qiymat — Qi*lat, Qi*lon
+yig'indilari, Haversine formulasidagi a va c qadamlari, har
+bir mezonning xom qiymati, normalizatsiyasi va vazn bilan
+ko'paytmasi — bosqichma-bosqich ko'rsatiladi. Demak dastur
+'qora qutiga' aylanmaydi, har bir raqam qayerdan kelganini
+tekshirib bo'ladi."
+
+   >>> Shu yerni ochib, bironta nomzodning Haversine va WSM
+       jadvalini ko'rsating — bu eng ta'sirli demo bo'ladi.
+
+----------------------------------------------------------
+6. XARITA USTIDA QISQA IZOH
+----------------------------------------------------------
+"Xaritada temir yo'l qatlami (OpenRailwayMap) ham yoqilgan:
+   - moviy nuqta   — TY stansiyasi
+   - qizil nuqta   — COG (og'irlik markazi)
+   - yashil belgi  — tanlangan optimal joy
+   - sariq kvadrat — avto LC nomzod
+   - siyohrang kvadrat — TY LC nomzod
+   - qora belgi    — chegara punkti
+   - samolyot belgisi — aeroport"
+
+==========================================================
+KOMISSIYA BERISHI MUMKIN BO'LGAN SAVOLLAR VA JAVOBLAR
+==========================================================
+
+S: Nega aynan Haversine formulasi, oddiy Yevklid masofasi
+   emas?
+J: Yer sirti sferaga yaqin, koordinatalar gradusda berilgan —
+   to'g'ri chiziqli masofa emas, balki sfera ustidagi haqiqiy
+   masofani hisoblash kerak, shuning uchun Haversine
+   ishlatildi.
+
+S: WSM vaznlarini qanday tanladingiz, nega Zj=0.30 eng katta?
+J: Ekspert baholash asosida — keltirilgan xarajat ko'rsatkichi
+   loyihaning iqtisodiy samaradorligi uchun eng muhim mezon,
+   shuning uchun eng yuqori vazn berildi; qolganlari logistik
+   joylashuvni belgilaydi.
+
+S: Dastur real ma'lumotlar bilan ishlaydimi, yoki faqat demo?
+J: Stansiya koordinatalari va mavjud markazlar haqiqiy
+   geografik ma'lumotlar (OpenStreetMap asosida), yuk
+   hajmlarini esa foydalanuvchi real statistik ma'lumot
+   asosida kiritadi — dastur har qanday yuk oqimi stsenariysi
+   uchun qayta hisoblaydi.
+
+S: Bu tizimni boshqa stansiya/hudud uchun ishlatish mumkinmi?
+J: Ha, data.js faylidagi koordinata va parametrlarni
+   o'zgartirish orqali tizim boshqa temir yo'l tuguniga
+   moslashtirilishi mumkin — arxitektura shu uchun modulli
+   qilib qurilgan.
+
+==========================================================
+MASLAHAT
+==========================================================
+Demoni oldindan bir marta sinab ko'ring (internet/loading
+sekinlashishi mumkin), va agar vaqt tor bo'lsa, "Hisob-kitob
+tafsilotlari"ni ochib ko'rsatishni albatta saqlang — bu
+komissiyaga ishni qancha chuqur bajarganingizni ko'rsatadigan
+eng kuchli dalil.
+==========================================================

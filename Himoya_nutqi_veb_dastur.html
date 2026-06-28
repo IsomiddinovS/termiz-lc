@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Himoya nutqi — Veb-dastur (DSS)</title>
+<style>
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+    line-height: 1.6;
+    color: #1f2937;
+    background: #fafafa;
+  }
+  h1 {
+    font-size: 22px;
+    color: #111827;
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 10px;
+  }
+  h2 {
+    font-size: 17px;
+    color: #1d4ed8;
+    margin-top: 32px;
+    background: #eff6ff;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  .meta {
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    margin: 16px 0;
+  }
+  .link {
+    font-weight: 700;
+    color: #b45309;
+  }
+  blockquote {
+    background: #ffffff;
+    border-left: 4px solid #2563eb;
+    margin: 10px 0;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #111827;
+  }
+  .demo-tip {
+    background: #ecfdf5;
+    border: 1px dashed #10b981;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    margin: 10px 0;
+    color: #065f46;
+  }
+  ul { padding-left: 20px; }
+  .qa {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .qa b.q { color: #b91c1c; }
+  .qa b.a { color: #047857; }
+  .formula {
+    font-family: "Courier New", monospace;
+    background: #111827;
+    color: #d1fae5;
+    padding: 10px 12px;
+    border-radius: 6px;
+    display: block;
+    margin: 8px 0;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+  .footer-tip {
+    margin-top: 30px;
+    background: #fef3c7;
+    border-radius: 10px;
+    padding: 14px;
+    font-weight: 600;
+  }
+  @media print {
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Himoya nutqi — Veb-dastur (DSS) qismi</h1>
+<div class="meta">
+  <b>Mavzu:</b> Termiz MTU temir yo'l tugunida logistika markazini joylashtirish — COG va WSM metodlari<br>
+  <b>Qo'llanma:</b> Taqdimotning 1–2 betini (mavzu, dolzarblik) o'zingiz gapirib o'tasiz, so'ng 14-slaydga ("DSS — Web ilova") kelganda quyidagi nutqqa o'tib, brauzerda saytni ochasiz:<br>
+  <span class="link">isomiddinovs.github.io/termiz-lc/</span>
+</div>
+
+<h2>1. O'tish gapi (slayddan veb-dasturga)</h2>
+<blockquote>
+"Hurmatli komissiya a'zolari, nazariy qismda ko'rib chiqilgan COG va WSM metodlarini qog'ozda qolib ketmasligi uchun, men ularni avtomatlashtiradigan interaktiv qaror qabul qilish tizimini — veb-dasturni ishlab chiqdim. Hozir uni jonli ko'rsatib, qanday ishlashini tushuntirib beraman."
+</blockquote>
+
+<h2>2. Dastur arxitekturasi (qisqa, texnik)</h2>
+<blockquote>
+"Dastur to'liq mustaqil ishlaydi — server yoki baza talab qilmaydi, faqat brauzerda ishlaydi. JavaScript va Leaflet.js xarita kutubxonasidan foydalanilgan. Uch qismdan iborat:"
+<ul>
+  <li><b>data.js</b> — barcha statik ma'lumotlar: 8 ta temir yo'l stansiyasi, mavjud logistika markazlari, aeroport va chegara punkti koordinatalari, normativlar;</li>
+  <li><b>calculations.js</b> — COG, Haversine va WSM formulalari yozilgan hisoblash moduli;</li>
+  <li><b>index.html</b> — interfeys, xarita va natijalarni ko'rsatish.</li>
+</ul>
+</blockquote>
+
+<h2>3. Chap panel — ma'lumot kiritish</h2>
+<blockquote>
+"Chap tomonda foydalanuvchi har bir stansiyaning yillik yuk oqimini (ming tonna/yil) kiritadi. Bu — birinchi mezon uchun kirish ma'lumoti. Quyida esa ikkinchi mezon uchun parametrlar: amortizatsiya normativi va stansiyaning yillik ekspluatatsiya xarajati — bularni komissiya a'zosi xohlasa o'zgartirib, natija qanday o'zgarishini ko'rishi mumkin."
+</blockquote>
+<div class="demo-tip">📍 Shu yerda 2–3 stansiyaga raqam kiriting: Termiz = 1500, G'alaba = 850, Qumqo'rg'on = 600</div>
+
+<h2>4. "Hisoblash" tugmasi — natija</h2>
+<blockquote>
+"Hisoblash tugmasini bosganda dastur ketma-ket uch bosqichni avtomatik bajaradi:"
+</blockquote>
+
+<p><b>Birinchi bosqich — COG (Og'irlik markazi).</b> Har bir stansiyaning yuk hajmi va koordinatasi asosida formula bo'yicha yuk oqimining "tortishish markazi" hisoblanadi:</p>
+<span class="formula">X0 = Σ(Qi·lati) / ΣQi
+Y0 = Σ(Qi·loni) / ΣQi</span>
+<p>Xaritada bu qizil nuqta bilan ko'rsatiladi, undan har bir stansiyaga chiziq tortiladi.</p>
+
+<p><b>Ikkinchi bosqich — Zj, keltirilgan xarajatlar.</b> Har bir nomzod joy (Termiz logistik markazi va Termiz stansiyasi) uchun COG nuqtasidan masofa Haversine formulasi orqali hisoblanadi, so'ngra ekspluatatsiya va amortizatsiya xarajatlari qo'shilib, umumiy keltirilgan xarajat — Zj — topiladi.</p>
+
+<p><b>Uchinchi bosqich — WSM, ko'p mezonli baholash.</b> Faqat xarajat yetarli emas — beshta mezon birlashtirildi:</p>
+<ul>
+  <li>Zj — vazn 0.30</li>
+  <li>COG dan masofa — vazn 0.22</li>
+  <li>Chegaragacha masofa — vazn 0.23</li>
+  <li>Aeroportgacha masofa — vazn 0.15</li>
+  <li>Infratuzilma uchburchagigacha masofa — vazn 0.10</li>
+</ul>
+<p>Har bir mezon normalizatsiya qilinadi — kichik qiymat yaxshi ball beradi — so'ng vaznlar bilan ko'paytirilib yig'indi hisoblanadi. Eng yuqori ball olgan nomzod xaritada yashil rang bilan ajratiladi.</p>
+
+<h2>5. "Hisob-kitob tafsilotlari" bo'limi — eng kuchli nuqta!</h2>
+<blockquote>
+"Komissiya savol berishini kutib, men maxsus shaffoflik uchun pastda 'Hisob-kitob tafsilotlari' bo'limini qo'shdim. Bu bo'limni ochsangiz, har bir oraliq qiymat — Qi×lat, Qi×lon yig'indilari, Haversine formulasidagi a va c qadamlari, har bir mezonning xom qiymati, normalizatsiyasi va vazn bilan ko'paytmasi — bosqichma-bosqich ko'rsatiladi. Demak dastur 'qora qutiga' aylanmaydi, har bir raqam qayerdan kelganini tekshirib bo'ladi."
+</blockquote>
+<div class="demo-tip">📍 Shu yerni ochib, bironta nomzodning Haversine va WSM jadvalini ko'rsating — bu eng ta'sirli demo bo'ladi.</div>
+
+<h2>6. Xarita ustida qisqa izoh</h2>
+<blockquote>
+"Xaritada temir yo'l qatlami (OpenRailwayMap) ham yoqilgan:"
+<ul>
+  <li>🔵 moviy nuqta — TY stansiyasi</li>
+  <li>🔴 qizil nuqta — COG (og'irlik markazi)</li>
+  <li>🟢 yashil belgi — tanlangan optimal joy</li>
+  <li>🟡 sariq kvadrat — avto LC nomzod</li>
+  <li>🟣 siyohrang kvadrat — TY LC nomzod</li>
+  <li>⚫ qora belgi — chegara punkti</li>
+  <li>✈️ samolyot belgisi — aeroport</li>
+</ul>
+</blockquote>
+
+<h2>Komissiya berishi mumkin bo'lgan savollar va javoblar</h2>
+
+<div class="qa">
+  <b class="q">S:</b> Nega aynan Haversine formulasi, oddiy Yevklid masofasi emas?<br>
+  <b class="a">J:</b> Yer sirti sferaga yaqin, koordinatalar gradusda berilgan — to'g'ri chiziqli masofa emas, balki sfera ustidagi haqiqiy masofani hisoblash kerak, shuning uchun Haversine ishlatildi.
+</div>
+
+<div class="qa">
+  <b class="q">S:</b> WSM vaznlarini qanday tanladingiz, nega Zj=0.30 eng katta?<br>
+  <b class="a">J:</b> Ekspert baholash asosida — keltirilgan xarajat ko'rsatkichi loyihaning iqtisodiy samaradorligi uchun eng muhim mezon, shuning uchun eng yuqori vazn berildi; qolganlari logistik joylashuvni belgilaydi.
+</div>
+
+<div class="qa">
+  <b class="q">S:</b> Dastur real ma'lumotlar bilan ishlaydimi, yoki faqat demo?<br>
+  <b class="a">J:</b> Stansiya koordinatalari va mavjud markazlar haqiqiy geografik ma'lumotlar (OpenStreetMap asosida), yuk hajmlarini esa foydalanuvchi real statistik ma'lumot asosida kiritadi — dastur har qanday yuk oqimi stsenariysi uchun qayta hisoblaydi.
+</div>
+
+<div class="qa">
+  <b class="q">S:</b> Bu tizimni boshqa stansiya/hudud uchun ishlatish mumkinmi?<br>
+  <b class="a">J:</b> Ha, data.js faylidagi koordinata va parametrlarni o'zgartirish orqali tizim boshqa temir yo'l tuguniga moslashtirilishi mumkin — arxitektura shu uchun modulli qilib qurilgan.
+</div>
+
+<div class="footer-tip">
+  💡 Maslahat: Demoni oldindan bir marta sinab ko'ring (internet/loading sekinlashishi mumkin), va agar vaqt tor bo'lsa, "Hisob-kitob tafsilotlari"ni ochib ko'rsatishni albatta saqlang — bu komissiyaga ishni qancha chuqur bajarganingizni ko'rsatadigan eng kuchli dalil.
+</div>
+
+</body>
+</html>
